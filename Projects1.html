@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSTR Clinical Spectrum Vision & Color Analytics Lab</title>
+    
+    <!-- Google Fonts & FontAwesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* ==========================================================================
+           1. CORE THEMING SYSTEM & DESIGN TOKENS
+           ========================================================================== */
+        :root {
+            --bg-body: #05040a;
+            --surface-card: rgba(13, 11, 26, 0.88);
+            --surface-hover: rgba(22, 18, 43, 0.95);
+            --surface-glass: rgba(255, 255, 255, 0.03);
+            
+            --primary: #8b5cf6;
+            --primary-glow: rgba(139, 92, 246, 0.35);
+            --accent: #00f2fe;
+            --accent-glow: rgba(0, 242, 254, 0.25);
+            --cyan-glow: rgba(6, 182, 212, 0.3);
+            
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #1e1b3a;
+            --border-highlight: rgba(139, 92, 246, 0.4);
+            
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+
+            --font-main: 'Tajawal', sans-serif;
+            --font-code: 'Fira Code', monospace;
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-sm: 10px;
+        }
+
+        [data-theme="light"] {
+            --bg-body: #f0f4f9;
+            --surface-card: rgba(255, 255, 255, 0.92);
+            --surface-hover: #ffffff;
+            --surface-glass: rgba(0, 0, 0, 0.02);
+            --primary: #6d28d9;
+            --primary-glow: rgba(109, 40, 217, 0.2);
+            --accent: #0284c7;
+            --accent-glow: rgba(2, 132, 199, 0.2);
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --border-color: #cbd5e1;
+            --border-highlight: rgba(109, 40, 217, 0.3);
+        }
+
+        /* ==========================================================================
+           2. RESET & BASE LAYOUTS
+           ========================================================================== */
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: var(--font-main);
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Medical Grid Background Ambient Effects */
+        body::before {
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(139, 92, 246, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(0, 242, 254, 0.08) 0%, transparent 40%),
+                linear-gradient(var(--border-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px;
+            opacity: 0.25; z-index: -1;
+        }
+
+        /* Header Elements */
+        .header-bar {
+            max-width: 1200px; width: 100%; margin: 0 auto; padding: 20px 25px;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
+        }
+
+        .brand-logo { font-size: 1.35rem; font-weight: 900; display: flex; align-items: center; gap: 12px; letter-spacing: -0.5px; }
+        .brand-logo i { color: var(--accent); filter: drop-shadow(0 0 8px var(--accent-glow)); }
+        .brand-logo span.tag { 
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 900;
+        }
+        .clinic-sub { font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-code); display: block; font-weight: 500; }
+
+        .top-controls { display: flex; align-items: center; gap: 12px; }
+
+        .lang-switcher {
+            display: flex; background: var(--surface-card); border: 1px solid var(--border-color);
+            padding: 4px; border-radius: 30px; backdrop-filter: blur(10px);
+        }
+        .lang-switcher button {
+            background: transparent; border: none; color: var(--text-muted);
+            font-size: 0.8rem; font-weight: 700; padding: 6px 14px; border-radius: 20px; cursor: pointer;
+        }
+        .lang-switcher button.active {
+            background: linear-gradient(135deg, var(--primary), #6366f1);
+            color: #fff; box-shadow: 0 0 12px var(--primary-glow);
+        }
+
+        .theme-toggle {
+            background: var(--surface-card); border: 1px solid var(--border-color);
+            color: var(--text-main); padding: 8px 16px; border-radius: 30px; cursor: pointer;
+            font-size: 0.85rem; display: flex; align-items: center; gap: 8px; backdrop-filter: blur(10px);
+        }
+        .theme-toggle:hover { border-color: var(--accent); }
+
+        /* Main Container Layout */
+        .app-container {
+            flex: 1; max-width: 1000px; width: 100%; margin: 10px auto 40px; padding: 0 20px;
+        }
+
+        .screen { display: none; opacity: 0; transform: translateY(15px); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .screen.active { display: block; opacity: 1; transform: translateY(0); }
+
+        /* Glassmorphic Main Card */
+        .main-card {
+            background: var(--surface-card); border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg); padding: 40px; backdrop-filter: blur(16px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4); position: relative; overflow: hidden;
+        }
+
+        .main-card::before {
+            content: ""; position: absolute; top: 0; right: 0; width: 100%; height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary), var(--accent), transparent);
+        }
+
+        .badge-pill {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(139, 92, 246, 0.12); border: 1px solid var(--border-highlight);
+            color: var(--accent); padding: 6px 18px; border-radius: 30px;
+            font-size: 0.85rem; font-weight: 700; margin-bottom: 20px;
+        }
+
+        .title-lg { font-size: 2.3rem; font-weight: 900; margin-bottom: 12px; line-height: 1.3; }
+        .title-lg span { color: var(--accent); }
+        .desc-text { color: var(--text-muted); font-size: 1.05rem; line-height: 1.8; max-width: 760px; margin: 0 auto 30px; }
+
+        /* Buttons & Actions */
+        .btn-action {
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+            background: linear-gradient(135deg, var(--primary), #4f46e5); color: #fff;
+            padding: 16px 36px; border-radius: var(--radius-md); font-weight: 800; font-size: 1.05rem;
+            border: none; cursor: pointer; text-decoration: none; box-shadow: 0 8px 25px var(--primary-glow);
+        }
+        .btn-action:hover { transform: translateY(-3px); box-shadow: 0 12px 35px var(--primary-glow); opacity: 0.96; }
+
+        .btn-outline {
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+            background: transparent; color: var(--text-main); border: 1px solid var(--border-color);
+            padding: 14px 28px; border-radius: var(--radius-md); font-weight: 700; cursor: pointer; text-decoration: none;
+        }
+        .btn-outline:hover { border-color: var(--accent); background: rgba(0, 242, 254, 0.08); }
+
+        /* Stats Feature Grid */
+        .feature-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin: 30px 0; text-align: right;
+        }
+        [dir="ltr"] .feature-grid { text-align: left; }
+
+        .feature-card {
+            background: var(--surface-glass); border: 1px solid var(--border-color);
+            padding: 20px; border-radius: var(--radius-md); transition: transform 0.2s ease;
+        }
+        .feature-card:hover { border-color: var(--border-highlight); transform: translateY(-3px); }
+        .feature-card i { font-size: 1.5rem; color: var(--accent); margin-bottom: 12px; }
+        .feature-card h4 { font-size: 1rem; color: var(--text-main); margin-bottom: 6px; font-weight: 700; }
+        .feature-card p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
+
+        /* ==========================================================================
+           3. QUIZ SCREEN ELEMENTS & VIEWPORTS
+           ========================================================================== */
+        .progress-box { width: 100%; margin-bottom: 25px; text-align: right; }
+        [dir="ltr"] .progress-box { text-align: left; }
+        .progress-info { display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 700; margin-bottom: 8px; color: var(--text-muted); }
+        .bar-bg { width: 100%; height: 10px; background: rgba(255, 255, 255, 0.06); border-radius: 20px; overflow: hidden; border: 1px solid var(--border-color); }
+        .bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--accent)); transition: width 0.3s ease; }
+
+        .quiz-header-meta {
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;
+        }
+        .mode-badge {
+            display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px; border-radius: 20px;
+            background: rgba(0, 242, 254, 0.1); border: 1px solid var(--accent);
+            color: var(--accent); font-size: 0.82rem; font-weight: 800;
+        }
+        .timer-badge {
+            font-family: var(--font-code); font-size: 0.85rem; color: var(--text-muted);
+            background: var(--surface-glass); border: 1px solid var(--border-color); padding: 6px 14px; border-radius: 20px;
+        }
+
+        .plate-viewport {
+            display: flex; justify-content: center; align-items: center; margin: 25px 0; min-height: 280px; position: relative;
+        }
+
+        /* Canvas Ishihara Engine */
+        canvas#ishiharaCanvas {
+            border-radius: 50%;
+            border: 4px solid rgba(139, 92, 246, 0.35);
+            box-shadow: 0 0 35px rgba(0, 0, 0, 0.6), 0 0 25px var(--primary-glow);
+            max-width: 100%; height: auto;
+        }
+
+        /* Pure Color Display Box */
+        .solid-color-box {
+            width: 250px; height: 250px; border-radius: 28px;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 30px var(--primary-glow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Contrast Testing Box */
+        .contrast-test-box {
+            width: 250px; height: 250px; border-radius: 28px;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            display: flex; justify-content: center; align-items: center;
+            font-size: 5rem; font-weight: 900; user-select: none;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Inspector Bar */
+        .palette-inspector {
+            background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color);
+            border-radius: var(--radius-md); padding: 18px 22px; margin: 25px 0;
+            display: flex; align-items: center; justify-content: space-between; gap: 15px; text-align: right;
+        }
+        [dir="ltr"] .palette-inspector { text-align: left; }
+        .palette-details h4 { font-size: 1.05rem; color: var(--accent); margin-bottom: 4px; font-weight: 800; }
+        .palette-details p { font-size: 0.85rem; color: var(--text-muted); font-family: var(--font-code); }
+
+        .color-preview-group { display: flex; gap: 10px; }
+        .color-swatch {
+            width: 42px; height: 42px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.25);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        /* Quiz Choices Grid */
+        .options-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-top: 25px;
+        }
+
+        .opt-btn {
+            background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color);
+            color: var(--text-main); padding: 18px 24px; border-radius: var(--radius-md);
+            font-weight: 800; font-size: 1.05rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .opt-btn:hover {
+            border-color: var(--accent); background: rgba(0, 242, 254, 0.12);
+            transform: translateY(-3px); box-shadow: 0 0 25px var(--accent-glow);
+        }
+
+        /* Distortion Checkbox */
+        .confirm-box {
+            background: rgba(139, 92, 246, 0.06); border: 1px dashed var(--primary);
+            border-radius: var(--radius-md); padding: 16px; margin-top: 25px; text-align: right;
+            display: flex; align-items: center; gap: 12px; cursor: pointer; font-size: 0.95rem;
+        }
+        [dir="ltr"] .confirm-box { text-align: left; }
+        .confirm-box input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--primary); cursor: pointer; }
+
+        /* ==========================================================================
+           4. MEDICAL REPORT SCREEN & MISSED COLORS TABLE
+           ========================================================================== */
+        .report-header { text-align: center; margin-bottom: 35px; border-bottom: 1px solid var(--border-color); padding-bottom: 25px; }
+        .status-tag { display: inline-block; padding: 10px 30px; border-radius: 30px; font-weight: 900; font-size: 1.3rem; margin-top: 15px; }
+        .status-tag.normal { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid var(--success); box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); }
+        .status-tag.defective { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid var(--danger); box-shadow: 0 0 20px rgba(239, 68, 68, 0.2); }
+
+        .report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; margin-bottom: 30px; text-align: right; }
+        [dir="ltr"] .report-grid { text-align: left; }
+
+        .report-stat-card {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border-color);
+            padding: 20px; border-radius: var(--radius-md);
+        }
+        .report-stat-card h5 { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 8px; font-weight: 600; }
+        .report-stat-card p { font-size: 1.3rem; font-weight: 900; color: var(--accent); font-family: var(--font-code); }
+
+        /* Detailed Missed Colors Table */
+        .section-title-sm {
+            font-size: 1.2rem; font-weight: 800; color: var(--text-main); margin: 30px 0 15px;
+            display: flex; align-items: center; gap: 10px; text-align: right;
+        }
+        [dir="ltr"] .section-title-sm { text-align: left; }
+
+        .table-responsive { width: 100%; overflow-x: auto; margin-bottom: 30px; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
+        
+        .missed-table {
+            width: 100%; border-collapse: collapse; text-align: right; font-size: 0.95rem; background: rgba(255, 255, 255, 0.01);
+        }
+        [dir="ltr"] .missed-table { text-align: left; }
+
+        .missed-table th {
+            background: rgba(139, 92, 246, 0.12); color: var(--accent); padding: 14px 18px;
+            font-weight: 800; border-bottom: 1px solid var(--border-color); white-space: nowrap;
+        }
+        .missed-table td {
+            padding: 14px 18px; border-bottom: 1px solid var(--border-color); color: var(--text-main); vertical-align: middle;
+        }
+        .missed-table tr:last-child td { border-bottom: none; }
+        .table-swatch { width: 28px; height: 28px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.3); display: inline-block; vertical-align: middle; }
+        
+        .badge-err { color: var(--danger); font-weight: 700; background: rgba(239, 68, 68, 0.1); padding: 4px 10px; border-radius: 12px; display: inline-block; }
+        .badge-ok { color: var(--success); font-weight: 700; background: rgba(16, 185, 129, 0.1); padding: 4px 10px; border-radius: 12px; display: inline-block; }
+
+        /* Advice Box */
+        .advice-box {
+            background: rgba(139, 92, 246, 0.08); border: 1px solid var(--primary);
+            border-radius: var(--radius-md); padding: 25px; text-align: right; margin-bottom: 35px;
+        }
+        [dir="ltr"] .advice-box { text-align: left; }
+        .advice-box h4 { color: var(--primary); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; font-size: 1.1rem; }
+        .advice-box ul { list-style: none; padding: 0; }
+        .advice-box li { color: var(--text-muted); font-size: 0.98rem; margin-bottom: 10px; line-height: 1.7; position: relative; padding-right: 22px; }
+        [dir="ltr"] .advice-box li { padding-right: 0; padding-left: 22px; }
+        .advice-box li::before { content: "✔"; color: var(--accent); font-weight: bold; position: absolute; right: 0; }
+        [dir="ltr"] .advice-box li::before { right: auto; left: 0; }
+
+        .report-signature {
+            display: flex; justify-content: space-between; align-items: center; margin-top: 30px;
+            padding-top: 20px; border-top: 1px dashed var(--border-color); font-size: 0.85rem; color: var(--text-muted);
+        }
+
+        .report-actions { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-top: 25px; }
+
+        footer { text-align: center; padding: 30px; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid var(--border-color); margin-top: auto; }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 768px) {
+            .main-card { padding: 25px 20px; }
+            .title-lg { font-size: 1.75rem; }
+            .palette-inspector { flex-direction: column; align-items: flex-start; }
+            .options-grid { grid-template-columns: 1fr; }
+            .solid-color-box, .contrast-test-box { width: 200px; height: 200px; }
+            .report-signature { flex-direction: column; gap: 10px; text-align: center; }
+        }
+
+        /* Printable PDF Styling */
+        @media print {
+            body { background: #fff !important; color: #000 !important; }
+            .header-bar, footer, .report-actions, .theme-toggle, .lang-switcher { display: none !important; }
+            .main-card { border: none !important; box-shadow: none !important; background: #fff !important; color: #000 !important; padding: 0 !important; }
+            .report-stat-card, .advice-box, .table-responsive { border: 1px solid #ccc !important; background: #fff !important; color: #000 !important; }
+            .status-tag { border: 1px solid #000 !important; color: #000 !important; background: transparent !important; }
+            .palette-details p, .palette-details h4, .advice-box h4, .report-stat-card p, .missed-table th, .missed-table td { color: #000 !important; }
+            .missed-table th { background: #f0f0f0 !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header class="header-bar">
+        <div class="brand-logo">
+            <i class="fa-solid fa-microscope"></i>
+            <div>
+                DSTR <span class="tag">SPECTRUM LAB</span>
+                <span class="clinic-sub">Clinical Vision & Color Diagnostic System v4.5</span>
+            </div>
+        </div>
+        <div class="top-controls">
+            <div class="lang-switcher">
+                <button onclick="setLanguage('ar')" id="lang-ar" class="active">AR</button>
+                <button onclick="setLanguage('en')" id="lang-en">EN</button>
+                <button onclick="setLanguage('fr')" id="lang-fr">FR</button>
+                <button onclick="setLanguage('tr')" id="lang-tr">TR</button>
+            </div>
+            <button class="theme-toggle" id="themeToggleBtn">
+                <i class="fa-solid fa-moon" id="themeIcon"></i>
+                <span id="themeText">الوضع الداكن</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="app-container">
+
+        <!-- SCREEN 1: Welcome & Clinical Overview Screen -->
+        <section id="screen-welcome" class="screen active">
+            <div class="main-card">
+                <div class="badge-pill">
+                    <i class="fa-solid fa-certificate"></i> <span id="t-badge-welcome">منظومة فحص طب العيون الرقمية</span>
+                </div>
+                <h1 class="title-lg" id="t-title-welcome">مختبر تشخيص <span>رؤية الألوان والتمييز البصري</span></h1>
+                <p class="desc-text" id="t-desc-welcome">
+                    منظومة طبية متكاملة تعتمد على خوارزميات إيشيهارا الرقمية الديناميكية، اختبارات التسمية الصريحة للألوان الأساسية والفرعية، وقياس حساسية التباين وزمن الاستجابة العصبية البصرية.
+                </p>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <i class="fa-solid fa-shuffle"></i>
+                        <h4 id="t-feat1-title">توليد عشوائي 100%</h4>
+                        <p id="t-feat1-desc">تتغير الأسئلة ودرجات الألوان وتسلسلها عشوائياً في كل اختبار لضمان دقة التشخيص.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fa-solid fa-stopwatch"></i>
+                        <h4 id="t-feat2-title">قياس زمن الاستجابة</h4>
+                        <p id="t-feat2-desc">تحليل دقيق بالملي ثانية لسعة التمييز البصري بين أطياف الضوء المختلفة.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fa-solid fa-palette"></i>
+                        <h4 id="t-feat3-title">تغطية شاملة للألوان</h4>
+                        <p id="t-feat3-desc">فحص الألوان الأساسية (مكررة) والفرعية المركبة مع تحليل الأخطاء في تقرير مفصل.</p>
+                    </div>
+                </div>
+
+                <button class="btn-action" onclick="startTest()">
+                    <i class="fa-solid fa-play"></i> <span id="t-btn-start">بدء الفحص التشخيصي الشامل</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- SCREEN 2: Quiz & Interactive Diagnostic Viewport Screen -->
+        <section id="screen-quiz" class="screen">
+            <div class="main-card">
+                
+                <!-- Progress Tracker -->
+                <div class="progress-box">
+                    <div class="progress-info">
+                        <span id="progressText">السؤال 1 من 14</span>
+                        <span id="progressPercent">7%</span>
+                    </div>
+                    <div class="bar-bg">
+                        <div class="bar-fill" id="progressBar"></div>
+                    </div>
+                </div>
+
+                <!-- Mode & Timer Indicator -->
+                <div class="quiz-header-meta">
+                    <div class="mode-badge" id="modeBadge">
+                        <i class="fa-solid fa-circle-dot"></i> <span id="modeBadgeText">نمط لوحات إيشيهارا الرقمية</span>
+                    </div>
+                    <div class="timer-badge">
+                        <i class="fa-regular fa-clock"></i> <span id="currentStepTimer">0.0s</span>
+                    </div>
+                </div>
+
+                <!-- Viewport Container (Swaps dynamically between Canvas, Solid Box, and Contrast Box) -->
+                <div class="plate-viewport">
+                    <canvas id="ishiharaCanvas" width="300" height="300"></canvas>
+                    <div id="solidColorBox" class="solid-color-box" style="display: none;"></div>
+                    <div id="contrastBox" class="contrast-test-box" style="display: none;">8</div>
+                </div>
+
+                <!-- Color Palette Inspector Bar -->
+                <div class="palette-inspector" id="paletteInspector">
+                    <div class="palette-details">
+                        <h4 id="inspectColorName">الدرجة المعتمدة: قرمزي حاد</h4>
+                        <p id="inspectColorCodes">HEX: #E74C3C | RGB: (231, 76, 60)</p>
+                    </div>
+                    <div class="color-preview-group" id="swatchGroup">
+                        <div class="color-swatch" id="swatchFg" title="Foreground Color"></div>
+                        <div class="color-swatch" id="swatchBg" title="Background Color"></div>
+                    </div>
+                </div>
+
+                <!-- Question Prompt Title -->
+                <p style="font-size:1.15rem; font-weight:800; margin-bottom:15px; text-align:center;" id="t-question-prompt">
+                    ما هو الرقم الذي تلاحظه داخل لوحة الدوائر الملونة؟
+                </p>
+
+                <!-- Options Choices Grid -->
+                <div class="options-grid" id="optionsContainer"></div>
+
+                <!-- Distortion Check Checkbox -->
+                <label class="confirm-box" id="confirmBoxContainer">
+                    <input type="checkbox" id="colorDistortionCheck">
+                    <span id="t-distortion-prompt">هل تلاحظ أن اللون المعروض في المربع أعلاه مائل للرمادي أو به تشوه بصري؟</span>
+                </label>
+
+            </div>
+        </section>
+
+        <!-- SCREEN 3: Comprehensive Clinical Report Screen -->
+        <section id="screen-report" class="screen">
+            <div class="main-card">
+                
+                <div class="report-header">
+                    <div class="badge-pill"><i class="fa-solid fa-file-waveform"></i> <span id="t-badge-report">تقرير التشخيص الطبي الرسمي</span></div>
+                    <h2 class="title-lg" id="t-report-title">تقرير فحص <span>سلامة رؤية الألوان</span></h2>
+                    <div class="status-tag" id="statusTag">طبيعي - رؤية سليمة 100%</div>
+                </div>
+
+                <!-- Primary Medical Metrics -->
+                <div class="report-grid">
+                    <div class="report-stat-card">
+                        <h5 id="t-lbl-score">النتيجة الإجمالية</h5>
+                        <p id="valScore">14 / 14</p>
+                    </div>
+                    <div class="report-stat-card">
+                        <h5 id="t-lbl-accuracy">دقة التمييز البصري</h5>
+                        <p id="valAccuracy">100%</p>
+                    </div>
+                    <div class="report-stat-card">
+                        <h5 id="t-lbl-time">متوسط زمن الاستجابة</h5>
+                        <p id="valAvgTime">1.45s</p>
+                    </div>
+                    <div class="report-stat-card">
+                        <h5 id="t-lbl-type">التشخيص الطبي المحدد</h5>
+                        <p id="valDiagnosis">رؤية ثلاثية طبيعية (Trichromacy)</p>
+                    </div>
+                </div>
+
+                <!-- SECTION: DETAILED MISSED & INCORRECT COLORS TABLE -->
+                <div class="section-title-sm" id="t-title-missed-section">
+                    <i class="fa-solid fa-list-check" style="color:var(--accent);"></i> تحليل الإجابات والألوان الخاطئة (Detailed Error Matrix)
+                </div>
+
+                <div class="table-responsive">
+                    <table class="missed-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th id="t-th-mode">نوع الاختبار</th>
+                                <th id="t-th-swatch">عينات الألوان</th>
+                                <th id="t-th-expected">الإجابة الصحيحة</th>
+                                <th id="t-th-given">إجابة المستخدم</th>
+                                <th id="t-th-codes">الرمز الكودي (HEX)</th>
+                                <th id="t-th-status">الحالة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="missedColorsTbody">
+                            <!-- Injected dynamically by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Clinical Recommendations Box -->
+                <div class="advice-box">
+                    <h4 id="t-advice-header"><i class="fa-solid fa-user-doctor"></i> التوصيات والنصائح المخصصة من المختبر:</h4>
+                    <ul id="adviceList">
+                        <!-- Dynamic Advice Items -->
+                    </ul>
+                </div>
+
+                <!-- Digital Verification Signature Bar -->
+                <div class="report-signature">
+                    <div>
+                        <strong>المختبر المعتمد:</strong> DSTR Clinical Vision Analytics Center<br>
+                        <span style="font-family: var(--font-code);">Ref Hash: <span id="reportHash">#DS-99824-2026</span></span>
+                    </div>
+                    <div>
+                        <strong>تاريخ التقرير:</strong> <span id="reportDate">2026-11-11</span><br>
+                        <strong>التوقيع الرقمي:</strong> <span style="color:var(--accent);">Verified Diagnostic System ✓</span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="report-actions">
+                    <button class="btn-action" onclick="window.print()">
+                        <i class="fa-solid fa-print"></i> <span id="t-btn-print">طباعة / تصدير التقرير PDF</span>
+                    </button>
+                    <button class="btn-outline" onclick="restartTest()">
+                        <i class="fa-solid fa-rotate-right"></i> <span id="t-btn-restart">إعادة الاختبار بأسئلة جديدة</span>
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p id="txt-rights">جميع الحقوق محفوظة © 2026 DSTR Spectrum Vision Laboratory | Clinical AI Diagnostic Suite</p>
+    </footer>
+
+    <!-- MAIN JAVASCRIPT ENGINE -->
+    <script>
+        /* ==========================================================================
+           1. MASTER DICTIONARY OF COLORS (PRIMARY REPEATED + SECONDARY)
+           ========================================================================== */
+        const MASTER_COLORS = [
+            // PRIMARY COLORS (Repeated with variants)
+            { key: "red", hex: "#e74c3c", nameAr: "أحمر", nameEn: "Red", nameFr: "Rouge", nameTr: "Kırmızı", isPrimary: true },
+            { key: "red_dark", hex: "#991b1b", nameAr: "أحمر داكن", nameEn: "Dark Red", nameFr: "Rouge Foncé", nameTr: "Koyu Kırmızı", isPrimary: true },
+            { key: "blue", hex: "#2563eb", nameAr: "أزرق", nameEn: "Blue", nameFr: "Bleu", nameTr: "Mavi", isPrimary: true },
+            { key: "blue_sky", hex: "#38bdf8", nameAr: "أزرق سماوي", nameEn: "Sky Blue", nameFr: "Bleu Ciel", nameTr: "Gök Mavisi", isPrimary: true },
+            { key: "green", hex: "#16a34a", nameAr: "أخضر", nameEn: "Green", nameFr: "Vert", nameTr: "Yeşil", isPrimary: true },
+            { key: "green_lime", hex: "#84cc16", nameAr: "أخضر ليموني", nameEn: "Lime Green", nameFr: "Vert Lime", nameTr: "Limon Yeşili", isPrimary: true },
+            { key: "yellow", hex: "#eab308", nameAr: "أصفر", nameEn: "Yellow", nameFr: "Jaune", nameTr: "Sarı", isPrimary: true },
+            { key: "yellow_amber", hex: "#f59e0b", nameAr: "أصفر عنبري", nameEn: "Amber Yellow", nameFr: "Jaune Ambre", nameTr: "Kehribar Sarı", isPrimary: true },
+
+            // SECONDARY & COMPOUND COLORS
+            { key: "orange", hex: "#ea580c", nameAr: "برتقالي", nameEn: "Orange", nameFr: "Orange", nameTr: "Turuncu" },
+            { key: "purple", hex: "#9333ea", nameAr: "بنفسجي", nameEn: "Purple", nameFr: "Pourpre", nameTr: "Mor" },
+            { key: "pink", hex: "#ec4899", nameAr: "وردي", nameEn: "Pink", nameFr: "Rose", nameTr: "Pembe" },
+            { key: "turquoise", hex: "#0d9488", nameAr: "تركواز / سجادي", nameEn: "Turquoise", nameFr: "Turquoise", nameTr: "Turkuaz" },
+            { key: "brown", hex: "#78350f", nameAr: "بني", nameEn: "Brown", nameFr: "Brun", nameTr: "Kahverengi" },
+            { key: "gray", hex: "#64748b", nameAr: "رمادي", nameEn: "Gray", nameFr: "Gris", nameTr: "Gri" },
+            { key: "black", hex: "#18181b", nameAr: "أسود", nameEn: "Black", nameFr: "Noir", nameTr: "Siyah" },
+            { key: "white", hex: "#f8fafc", nameAr: "أبيض", nameEn: "White", nameFr: "Blanc", nameTr: "Beyaz" },
+            { key: "gold", hex: "#d97706", nameAr: "ذهبي", nameEn: "Gold", nameFr: "Or", nameTr: "Altın" }
+        ];
+
+        /* ==========================================================================
+           2. ISHIHARA DATA POOL
+           ========================================================================== */
+        const ISHIHARA_POOL = [
+            { number: "12", targetType: "demo", fgColor: "#E74C3C", bgColor: "#2ECC71", nameAr: "أحمر x أخضر", nameEn: "Red vs Green" },
+            { number: "8", targetType: "red-green", fgColor: "#E67E22", bgColor: "#27AE60", nameAr: "برتقالي x أخضر", nameEn: "Orange vs Green" },
+            { number: "6", targetType: "red-green", fgColor: "#C0392B", bgColor: "#1ABC9C", nameAr: "أحمر داكن x تركوازي", nameEn: "Dark Red vs Turquoise" },
+            { number: "29", targetType: "red-green", fgColor: "#D35400", bgColor: "#16A085", nameAr: "صدئي x أخضر بحري", nameEn: "Rust vs Sea Green" },
+            { number: "5", targetType: "protan", fgColor: "#E74C3C", bgColor: "#7F8C8D", nameAr: "أحمر x رمادي خضري", nameEn: "Red vs Gray Green" },
+            { number: "3", targetType: "deutan", fgColor: "#2ECC71", bgColor: "#95A5A6", nameAr: "أخضر x رمادي أحمر", nameEn: "Green vs Gray Red" },
+            { number: "74", targetType: "red-green", fgColor: "#E74C3C", bgColor: "#3498DB", nameAr: "أحمر x أزرق", nameEn: "Red vs Blue" },
+            { number: "45", targetType: "tritan", fgColor: "#F1C40F", bgColor: "#9B59B6", nameAr: "أصفر x بنفسجي", nameEn: "Yellow vs Purple" }
+        ];
+
+        /* ==========================================================================
+           3. TRANSLATION DICTIONARIES
+           ========================================================================== */
+        const translations = {
+            ar: {
+                badgeWelcome: "منظومة فحص طب العيون الرقمية",
+                titleWelcome: "مختبر تشخيص <span>رؤية الألوان والتمييز البصري</span>",
+                descWelcome: "منظومة طبية متكاملة تعتمد على خوارزميات إيشيهارا الرقمية الديناميكية، اختبارات التسمية الصريحة للألوان الأساسية والفرعية، وقياس حساسية التباين وزمن الاستجابة العصبية البصرية.",
+                feat1Title: "توليد عشوائي 100%", feat1Desc: "تتغير الأسئلة ودرجات الألوان وتسلسلها عشوائياً في كل اختبار لضمان دقة التشخيص.",
+                feat2Title: "قياس زمن الاستجابة", feat2Desc: "تحليل دقيق بالملي ثانية لسعة التمييز البصري بين أطياف الضوء المختلفة.",
+                feat3Title: "تغطية شاملة للألوان", feat3Desc: "فحص الألوان الأساسية (مكررة) والفرعية المركبة مع تحليل الأخطاء في تقرير مفصل.",
+                btnStart: "بدء الفحص التشخيصي الشامل",
+                
+                modeIshihara: "نمط لوحات إيشيهارا الرقمية",
+                modeNaming: "نمط تسمية اللون الصريح",
+                modeContrast: "نمط تباين وحساسية التشبع",
+
+                promptIshihara: "ما هو الرقم الذي تلاحظه داخل لوحة الدوائر الملونة؟",
+                promptNaming: "اختر الاسم الصحيح للون الظاهر داخل المربع:",
+                promptContrast: "ما هو الرقم المختفي داخل مربع التباين ضعيف التشبع؟",
+                
+                distortionPrompt: "هل تلاحظ أن اللون المعروض في المربع أعلاه مائل للرمادي أو به تشوه بصري؟",
+                badgeReport: "تقرير التشخيص الطبي الرسمي",
+                reportTitle: "تقرير فحص <span>سلامة رؤية الألوان</span>",
+                lblScore: "النتيجة الإجمالية",
+                lblAccuracy: "دقة التمييز البصري",
+                lblAvgTime: "متوسط زمن الاستجابة",
+                lblType: "التشخيص الطبي المحدد",
+                titleMissedSection: "تحليل الإجابات والألوان الخاطئة (Detailed Error Matrix)",
+                
+                thMode: "نوع الاختبار",
+                thSwatch: "عينات الألوان",
+                thExpected: "الإجابة الصحيحة",
+                thGiven: "إجابة المستخدم",
+                thCodes: "الرمز الكودي (HEX)",
+                thStatus: "الحالة",
+
+                adviceHeader: "التوصيات والنصائح المخصصة من المختبر:",
+                btnPrint: "طباعة / تصدير التقرير PDF",
+                btnRestart: "إعادة الاختبار بأسئلة جديدة",
+                rights: "جميع الحقوق محفوظة © 2026 DSTR Spectrum Vision Laboratory | Clinical AI Diagnostic Suite",
+                dark: "الوضع الداكن", light: "الوضع الفاتح",
+                noneOpt: "لا أرى أي رقم",
+
+                normalTitle: "طبيعي - رؤية سليمة 100%",
+                normalDiag: "رؤية ثلاثية طبيعية (Trichromacy)",
+                protanDiag: "عمى الألوان الأحمري (Protanopia / Protanomaly)",
+                deutanDiag: "عمى الألوان الاخضري (Deuteranopia / Deuteranomaly)",
+                tritanDiag: "عمى الألوان الأزرق/الأصفر (Tritanopia)",
+                generalDiag: "خلل جزئي في تمييز الألوان والتباين",
+
+                adviceNormal: [
+                    "قدرتك على تمييز الألوان وتسميتها وزمن استجابتك البصرية تقع جميعها في النطاق السليم 100%.",
+                    "لا توجد أي علامات لإجهاد الشبكية أو نقص في إبصار الأطياف الضوئية الأساسية.",
+                    "ينصح باتباع قاعدة 20-20-20 عند العمل المطول أمام شاشات الكمبيوتر لحماية سلامة البصر."
+                ],
+                adviceRedGreen: [
+                    "تظهر النتائج وجود صعوبة في تمييز الأطياف بين الأحمر والأخضر (Protan/Deutan Deficiency).",
+                    "ينصح بتفعيل فلاتر سهولة الوصول الخاصة بعمى الألوان في أنظمة التشغيل (Daltonize Filter).",
+                    "اعتمد دائماً على القيم النصية والأكواد الرقمية (HEX / RGB) في التصاميم والعمل البرمجي.",
+                    "يفضل مراجعة طبيب عيون لإجراء فحص قاع العين واختبار Farnsworth-Munsell 100 Hue."
+                ],
+                adviceBlueYellow: [
+                    "تظهر النتائج انخفاضاً في حساسية التمييز بين طيف الأزرق والأصفر (Tritan Deficiency).",
+                    "ينصح بضبط حرارة لون الشاشات وتقليل الضوء الأزرق المباشر.",
+                    "استخدم أدوات التباين المعتمدة (WCAG Tools) لضمان وضوح النصوص الرقمية."
+                ]
+            },
+            en: {
+                badgeWelcome: "Digital Ophthalmologic System",
+                titleWelcome: "Color Vision <span>& Spectrum Analytics Lab</span>",
+                descWelcome: "Comprehensive medical suite using dynamic digital Ishihara engine, solid color naming matrix, contrast sensitivity test, and millisecond neural response analysis.",
+                feat1Title: "100% Randomized", feat1Desc: "Questions, color shades, and sequence reshuffle on every attempt.",
+                feat2Title: "Response Time Tracking", feat2Desc: "Precise millisecond analytics measuring visual neural discrimination speed.",
+                feat3Title: "Full Spectrum Coverage", feat3Desc: "Tests primary (repeated) & secondary colors with error breakdown matrix.",
+                btnStart: "Start Comprehensive Assessment",
+                
+                modeIshihara: "Digital Ishihara Mode",
+                modeNaming: "Solid Color Naming Mode",
+                modeContrast: "Contrast & Saturation Mode",
+
+                promptIshihara: "What number do you see inside the colored dot plate?",
+                promptNaming: "Select the correct name for the highlighted color:",
+                promptContrast: "What hidden number do you see inside the low-contrast box?",
+                
+                distortionPrompt: "Do you notice the highlighted color above looks grayish or distorted?",
+                badgeReport: "Official Diagnostic Medical Report",
+                reportTitle: "Color Vision <span>Analytics Report</span>",
+                lblScore: "Total Score",
+                lblAccuracy: "Visual Accuracy",
+                lblAvgTime: "Avg Response Time",
+                lblType: "Specific Clinical Diagnosis",
+                titleMissedSection: "Detailed Error & Missed Colors Matrix",
+                
+                thMode: "Test Mode",
+                thSwatch: "Color Swatch",
+                thExpected: "Correct Answer",
+                thGiven: "User Input",
+                thCodes: "Hex Code",
+                thStatus: "Status",
+
+                adviceHeader: "Clinical Recommendations & Action Plan:",
+                btnPrint: "Print / Export PDF Report",
+                btnRestart: "Restart With New Question Set",
+                rights: "All rights reserved © 2026 DSTR Spectrum Vision Laboratory | Clinical AI Diagnostic Suite",
+                dark: "Dark Mode", light: "Light Mode",
+                noneOpt: "I see no number",
+
+                normalTitle: "Normal - 100% Clear Vision",
+                normalDiag: "Normal Trichromacy Vision",
+                protanDiag: "Protan Deficiency (Red-Blind)",
+                deutanDiag: "Deutan Deficiency (Green-Blind)",
+                tritanDiag: "Tritan Deficiency (Blue-Yellow)",
+                generalDiag: "Partial Color & Contrast Deficiency",
+
+                adviceNormal: [
+                    "Your visual color discrimination, naming accuracy, and response timing are perfectly normal.",
+                    "No retinal fatigue or spectral blindness indicators detected.",
+                    "Maintain the 20-20-20 rule during screen work to protect long-term visual health."
+                ],
+                adviceRedGreen: [
+                    "Results indicate difficulty distinguishing shades in Red-Green spectrums (Protan/Deutan).",
+                    "We recommend enabling Red-Green Daltonize filters in system accessibility settings.",
+                    "Rely on exact HEX/RGB codes for graphic design and software development.",
+                    "Consult an eye specialist for a comprehensive retinal exam and Farnsworth-Munsell test."
+                ],
+                adviceBlueYellow: [
+                    "Results show reduced sensitivity in the Blue-Yellow color spectrum (Tritan Deficiency).",
+                    "Adjust screen color temperature and reduce harsh blue light exposure.",
+                    "Utilize WCAG contrast tools for digital workspace legibility."
+                ]
+            },
+            fr: {
+                badgeWelcome: "Système Ophtalmologique Numérique",
+                titleWelcome: "Laboratoire de Vision <span>et Analyse des Couleurs</span>",
+                descWelcome: "Plateforme médicale intégrant les planches d'Ishihara, les tests de dénomination des couleurs et l'analyse du temps de réponse en millisecondes.",
+                feat1Title: "100% Aléatoire", feat1Desc: "Questions et nuances de couleurs mélangées à chaque essai.",
+                feat2Title: "Chronométrage Précis", feat2Desc: "Mesure en ms de la vitesse de discrimination visuelle.",
+                feat3Title: "Spectre Complet", feat3Desc: "Examen des couleurs primaires (répétées) et secondaires.",
+                btnStart: "Démarrer l'Examen Complet",
+                
+                modeIshihara: "Mode Ishihara Numérique",
+                modeNaming: "Mode Dénomination de Couleur",
+                modeContrast: "Mode Sensibilité au Contraste",
+
+                promptIshihara: "Quel numéro voyez-vous dans le cercle ?",
+                promptNaming: "Sélectionnez le nom correct de la couleur :",
+                promptContrast: "Quel chiffre masqué voyez-vous dans le carré ?",
+                
+                distortionPrompt: "Remarquez-vous que la couleur ci-dessus semble grisâtre ?",
+                badgeReport: "Rapport Médical Officiel",
+                reportTitle: "Rapport de Vision <span>des Couleurs</span>",
+                lblScore: "Score Total",
+                lblAccuracy: "Précision Visuelle",
+                lblAvgTime: "Temps Moyen",
+                lblType: "Diagnostic Clinique",
+                titleMissedSection: "Matrice Détaillée des Erreurs",
+                
+                thMode: "Mode",
+                thSwatch: "Échantillon",
+                thExpected: "Réponse Correcte",
+                thGiven: "Réponse Utilisateur",
+                thCodes: "Code HEX",
+                thStatus: "Statut",
+
+                adviceHeader: "Recommandations Cliniques :",
+                btnPrint: "Imprimer / Exporter PDF",
+                btnRestart: "Recommencer avec Nouvelles Questions",
+                rights: "Tous droits réservés © 2026 DSTR Spectrum Vision Laboratory",
+                dark: "Mode Sombre", light: "Mode Clair",
+                noneOpt: "Je ne vois aucun chiffre",
+
+                normalTitle: "Normal - Vision 100% Claire",
+                normalDiag: "Vision Trichromatique Normale",
+                protanDiag: "Déficience Protan (Rouge)",
+                deutanDiag: "Déficience Deutan (Vert)",
+                tritanDiag: "Déficience Tritan (Bleu-Jaune)",
+                generalDiag: "Déficience Partielle de Contraste",
+
+                adviceNormal: [
+                    "Votre capacité de discrimination des couleurs et votre temps de réponse sont excellents.",
+                    "Aucun signe de fatigue rétinienne détecté.",
+                    "Suivez la règle 20-20-20 lors des sessions sur écran."
+                ],
+                adviceRedGreen: [
+                    "Les résultats indiquent une difficulté dans le spectre rouge-vert.",
+                    "Activez les filtres d'accessibilité rouge-vert sur vos systèmes.",
+                    "Utilisez les codes HEX/RGB pour vos travaux de conception."
+                ],
+                adviceBlueYellow: [
+                    "Sensibilité réduite dans le spectre bleu-jaune.",
+                    "Ajustez la température de couleur de votre écran."
+                ]
+            },
+            tr: {
+                badgeWelcome: "Dijital Oftalmolojik Sistem",
+                titleWelcome: "Renk Görme <span>ve Spektrum Analiz Lab</span>",
+                descWelcome: "Dinamik Ishihara algoritması, düz renk adlandırma matrisi ve milisaniye tepki süresi analizi sunan klinik sistem.",
+                feat1Title: "%100 Rastgele", feat1Desc: "Sorular ve renk tonları her testte tamamen değişir.",
+                feat2Title: "Tepki Süresi Ölçümü", feat2Desc: "Görsel sinirsel ayırt etme hızının ms cinsinden ölçümü.",
+                feat3Title: "Tam Spektrum Kapsamı", feat3Desc: "Birincil ve ikincil renklerin detaylı hata analizi.",
+                btnStart: "Kapsamlı Testi Başlat",
+                
+                modeIshihara: "Dijital Ishihara Modu",
+                modeNaming: "Düz Renk Adlandırma Modu",
+                modeContrast: "Kontrast Hassasiyet Modu",
+
+                promptIshihara: "Noktalı daire içinde hangi numarayı görüyorsunuz?",
+                promptNaming: "Görüntülenen rengin doğru adını seçin:",
+                promptContrast: "Düşük kontrastlı kutu içindeki gizli numarayı görün:",
+                
+                distortionPrompt: "Yukarıdaki rengin grimsi göründüğünü fark ediyor musunuz?",
+                badgeReport: "Resmi Tıbbi Teşhis Raporu",
+                reportTitle: "Renk Görme <span>Analiz Raporu</span>",
+                lblScore: "Toplam Puan",
+                lblAccuracy: "Görsel Hassasiyet",
+                lblAvgTime: "Ort. Tepki Süresi",
+                lblType: "Klinik Teşhis",
+                titleMissedSection: "Detaylı Hata Matrisi",
+                
+                thMode: "Test Modu",
+                thSwatch: "Renk Örneği",
+                thExpected: "Doğru Cevap",
+                thGiven: "Kullanıcı Yanıtı",
+                thCodes: "HEX Kodu",
+                thStatus: "Durum",
+
+                adviceHeader: "Klinik Tavsiyeler:",
+                btnPrint: "Yazdır / PDF Dışa Aktar",
+                btnRestart: "Yeni Sorularla Yeniden Başlat",
+                rights: "Tüm hakları saklıdır © 2026 DSTR Spectrum Vision Laboratory",
+                dark: "Karanlık Mod", light: "Aydınlık Mod",
+                noneOpt: "Hiçbir numara görmüyorum",
+
+                normalTitle: "Normal - %100 Net Görüş",
+                normalDiag: "Normal Trikromasi Görüşü",
+                protanDiag: "Protan Eksikliği (Kırmızı)",
+                deutanDiag: "Deutan Eksikliği (Yeşil)",
+                tritanDiag: "Tritan Eksikliği (Mavi-Sarı)",
+                generalDiag: "Kısmi Kontrast Eksikliği",
+
+                adviceNormal: [
+                    "Renk ayırt etme yeteneğiniz ve tepki süreniz tamamen normaldir.",
+                    "Ekran çalışmalarında 20-20-20 kuralını uygulayın."
+                ],
+                adviceRedGreen: [
+                    "Kırmızı-Yeşil spektrumunda ayırt etme güçlüğü tespit edildi.",
+                    "Erişilebilirlik renk filtrelerini etkinleştirin."
+                ],
+                adviceBlueYellow: [
+                    "Mavi-Sarı spektrumunda hassasiyet azalması tespit edildi."
+                ]
+            }
+        };
+
+        /* ==========================================================================
+           4. DYNAMIC RANDOMIZED QUESTION GENERATOR ALGORITHM
+           ========================================================================== */
+        let currentLang = localStorage.getItem('dstr_lab_lang') || 'ar';
+        let generatedQuestions = [];
+        let currentIndex = 0;
+        let userAnswers = [];
+        let distortionCount = 0;
+        
+        let stepStartTime = 0;
+        let stepTimerInterval = null;
+
+        function shuffleArray(arr) {
+            const copy = [...arr];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        function generateRandomQuestionSet() {
+            const questions = [];
+
+            // 1. ISHIHARA RANDOM SELECTION (5 Questions)
+            const shuffledIshihara = shuffleArray(ISHIHARA_POOL).slice(0, 5);
+            shuffledIshihara.forEach(ish => {
+                questions.push({
+                    type: "ishihara",
+                    data: ish,
+                    expected: ish.number
+                });
+            });
+
+            // 2. SOLID COLOR NAMING GENERATOR (Ensure Primary Colors appear TWICE + Secondary Colors)
+            const primaryColors = MASTER_COLORS.filter(c => c.isPrimary);
+            const secondaryColors = MASTER_COLORS.filter(c => !c.isPrimary);
+
+            // Primary Colors Batch 1 & 2 (Scrambled)
+            const chosenPrimariesBatch1 = shuffleArray(primaryColors);
+            const chosenPrimariesBatch2 = shuffleArray(primaryColors);
+            const chosenSecondaries = shuffleArray(secondaryColors).slice(0, 3);
+
+            const allNamingColors = [...chosenPrimariesBatch1, ...chosenPrimariesBatch2, ...chosenSecondaries];
+            const scrambledNamingList = shuffleArray(allNamingColors).slice(0, 7);
+
+            scrambledNamingList.forEach(colorObj => {
+                // Generate 3 wrong decoy options
+                const otherColors = MASTER_COLORS.filter(c => c.key !== colorObj.key);
+                const decoys = shuffleArray(otherColors).slice(0, 3);
+                const optionsKeys = shuffleArray([colorObj.key, ...decoys.map(d => d.key)]);
+
+                questions.push({
+                    type: "color-naming",
+                    colorObj: colorObj,
+                    expectedKey: colorObj.key,
+                    optionsKeys: optionsKeys
+                });
+            });
+
+            // 3. CONTRAST & SATURATION SENSITIVITY TEST (2 Questions)
+            const contrastDigits = ["8", "5", "3", "6", "9"];
+            const selectedDigits = shuffleArray(contrastDigits).slice(0, 2);
+
+            selectedDigits.forEach(num => {
+                const decoys = ["2", "7", "4", "none"];
+                const options = shuffleArray([num, ...decoys]);
+                questions.push({
+                    type: "contrast",
+                    number: num,
+                    bgColor: "#1e293b",
+                    fgColor: "#334155",
+                    expected: num,
+                    options: options
+                });
+            });
+
+            return shuffleArray(questions); // Final Scramble of All Question Modes
+        }
+
+        /* ==========================================================================
+           5. APP ENGINE & UI CONTROLLER
+           ========================================================================== */
+        document.addEventListener('DOMContentLoaded', () => {
+            setLanguage(currentLang);
+            initTheme();
+        });
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('dstr_lab_lang', lang);
+            document.documentElement.setAttribute('lang', lang);
+            document.documentElement.setAttribute('dir', (lang === 'ar') ? 'rtl' : 'ltr');
+
+            document.querySelectorAll('.lang-switcher button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('lang-' + lang).classList.add('active');
+
+            const t = translations[lang] || translations.ar;
+            
+            document.getElementById('t-badge-welcome').textContent = t.badgeWelcome;
+            document.getElementById('t-title-welcome').innerHTML = t.titleWelcome;
+            document.getElementById('t-desc-welcome').textContent = t.descWelcome;
+            document.getElementById('t-feat1-title').textContent = t.feat1Title;
+            document.getElementById('t-feat1-desc').textContent = t.feat1Desc;
+            document.getElementById('t-feat2-title').textContent = t.feat2Title;
+            document.getElementById('t-feat2-desc').textContent = t.feat2Desc;
+            document.getElementById('t-feat3-title').textContent = t.feat3Title;
+            document.getElementById('t-feat3-desc').textContent = t.feat3Desc;
+            document.getElementById('t-btn-start').textContent = t.btnStart;
+            
+            document.getElementById('t-distortion-prompt').textContent = t.distortionPrompt;
+            document.getElementById('t-badge-report').textContent = t.badgeReport;
+            document.getElementById('t-report-title').innerHTML = t.reportTitle;
+            document.getElementById('t-lbl-score').textContent = t.lblScore;
+            document.getElementById('t-lbl-accuracy').textContent = t.lblAccuracy;
+            document.getElementById('t-lbl-time').textContent = t.lblAvgTime;
+            document.getElementById('t-lbl-type').textContent = t.lblType;
+            document.getElementById('t-title-missed-section').innerHTML = `<i class="fa-solid fa-list-check" style="color:var(--accent);"></i> ` + t.titleMissedSection;
+            
+            document.getElementById('t-th-mode').textContent = t.thMode;
+            document.getElementById('t-th-swatch').textContent = t.thSwatch;
+            document.getElementById('t-th-expected').textContent = t.thExpected;
+            document.getElementById('t-th-given').textContent = t.thGiven;
+            document.getElementById('t-th-codes').textContent = t.thCodes;
+            document.getElementById('t-th-status').textContent = t.thStatus;
+
+            document.getElementById('t-advice-header').innerHTML = `<i class="fa-solid fa-user-doctor"></i> ` + t.adviceHeader;
+            document.getElementById('t-btn-print').textContent = t.btnPrint;
+            document.getElementById('t-btn-restart').textContent = t.btnRestart;
+            document.getElementById('txt-rights').textContent = t.rights;
+
+            if (document.getElementById('screen-quiz').classList.contains('active')) {
+                renderCurrentQuestion();
+            }
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function startTest() {
+            generatedQuestions = generateRandomQuestionSet();
+            currentIndex = 0;
+            userAnswers = [];
+            distortionCount = 0;
+            showScreen('screen-quiz');
+            renderCurrentQuestion();
+        }
+
+        function restartTest() {
+            startTest();
+        }
+
+        /* ==========================================================================
+           6. QUESTION STEPPER & CANVASES
+           ========================================================================== */
+        function renderCurrentQuestion() {
+            const q = generatedQuestions[currentIndex];
+            const t = translations[currentLang] || translations.ar;
+
+            // Reset Timer
+            stepStartTime = performance.now();
+            if (stepTimerInterval) clearInterval(stepTimerInterval);
+            stepTimerInterval = setInterval(() => {
+                const elapsed = ((performance.now() - stepStartTime) / 1000).toFixed(1);
+                document.getElementById('currentStepTimer').textContent = elapsed + 's';
+            }, 100);
+
+            // Progress Bar
+            const progressPct = Math.round(((currentIndex + 1) / generatedQuestions.length) * 100);
+            document.getElementById('progressPercent').textContent = progressPct + '%';
+            document.getElementById('progressBar').style.width = progressPct + '%';
+            document.getElementById('progressText').textContent = (currentLang === 'ar')
+                ? `السؤال ${currentIndex + 1} من ${generatedQuestions.length}`
+                : `Question ${currentIndex + 1} of ${generatedQuestions.length}`;
+
+            // Reset Viewport displays
+            const canvas = document.getElementById('ishiharaCanvas');
+            const solidBox = document.getElementById('solidColorBox');
+            const contrastBox = document.getElementById('contrastBox');
+            
+            canvas.style.display = 'none';
+            solidBox.style.display = 'none';
+            contrastBox.style.display = 'none';
+
+            const modeBadgeText = document.getElementById('modeBadgeText');
+            const questionPrompt = document.getElementById('t-question-prompt');
+            const optionsContainer = document.getElementById('optionsContainer');
+            const inspectColorName = document.getElementById('inspectColorName');
+            const inspectColorCodes = document.getElementById('inspectColorCodes');
+            const swatchFg = document.getElementById('swatchFg');
+            const swatchBg = document.getElementById('swatchBg');
+
+            document.getElementById('colorDistortionCheck').checked = false;
+            optionsContainer.innerHTML = '';
+
+            // MODE A: ISHIHARA PLATES
+            if (q.type === 'ishihara') {
+                canvas.style.display = 'block';
+                modeBadgeText.textContent = t.modeIshihara;
+                questionPrompt.textContent = t.promptIshihara;
+
+                renderIshiharaPlate(q.data);
+
+                swatchFg.style.backgroundColor = q.data.fgColor;
+                swatchBg.style.backgroundColor = q.data.bgColor;
+                swatchBg.style.display = 'block';
+
+                inspectColorName.textContent = (currentLang === 'ar') ? q.data.nameAr : q.data.nameEn;
+                inspectColorCodes.textContent = `HEX: ${q.data.fgColor} | ${hexToRgb(q.data.fgColor)}`;
+
+                const opts = shuffleArray([q.data.number, "8", "3", "none"]);
+                opts.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.className = 'opt-btn';
+                    btn.textContent = (opt === 'none') ? t.noneOpt : opt;
+                    btn.onclick = () => handleAnswer(opt);
+                    optionsContainer.appendChild(btn);
+                });
+            }
+            // MODE B: SOLID COLOR NAMING
+            else if (q.type === 'color-naming') {
+                solidBox.style.display = 'block';
+                solidBox.style.backgroundColor = q.colorObj.hex;
+                modeBadgeText.textContent = t.modeNaming;
+                questionPrompt.textContent = t.promptNaming;
+
+                swatchFg.style.backgroundColor = q.colorObj.hex;
+                swatchBg.style.display = 'none';
+
+                const colorName = getColorNameTranslated(q.colorObj, currentLang);
+                inspectColorName.textContent = colorName;
+                inspectColorCodes.textContent = `HEX: ${q.colorObj.hex} | ${hexToRgb(q.colorObj.hex)}`;
+
+                q.optionsKeys.forEach(key => {
+                    const matchedObj = MASTER_COLORS.find(c => c.key === key);
+                    const label = matchedObj ? getColorNameTranslated(matchedObj, currentLang) : key;
+                    
+                    const btn = document.createElement('button');
+                    btn.className = 'opt-btn';
+                    btn.textContent = label;
+                    btn.onclick = () => handleAnswer(key);
+                    optionsContainer.appendChild(btn);
+                });
+            }
+            // MODE C: CONTRAST SENSITIVITY
+            else if (q.type === 'contrast') {
+                contrastBox.style.display = 'flex';
+                contrastBox.style.backgroundColor = q.bgColor;
+                contrastBox.style.color = q.fgColor;
+                contrastBox.textContent = q.number;
+
+                modeBadgeText.textContent = t.modeContrast;
+                questionPrompt.textContent = t.promptContrast;
+
+                swatchFg.style.backgroundColor = q.fgColor;
+                swatchBg.style.backgroundColor = q.bgColor;
+                swatchBg.style.display = 'block';
+
+                inspectColorName.textContent = "تباين ضئيل (Low Saturation Contrast)";
+                inspectColorCodes.textContent = `HEX: ${q.fgColor} vs ${q.bgColor}`;
+
+                q.options.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.className = 'opt-btn';
+                    btn.textContent = (opt === 'none') ? t.noneOpt : opt;
+                    btn.onclick = () => handleAnswer(opt);
+                    optionsContainer.appendChild(btn);
+                });
+            }
+        }
+
+        function getColorNameTranslated(colorObj, lang) {
+            if (lang === 'en') return colorObj.nameEn;
+            if (lang === 'fr') return colorObj.nameFr;
+            if (lang === 'tr') return colorObj.nameTr;
+            return colorObj.nameAr;
+        }
+
+        function handleAnswer(selectedVal) {
+            if (stepTimerInterval) clearInterval(stepTimerInterval);
+            const responseTimeMs = Math.round(performance.now() - stepStartTime);
+
+            const q = generatedQuestions[currentIndex];
+            let isCorrect = false;
+
+            if (q.type === 'ishihara' || q.type === 'contrast') {
+                isCorrect = (selectedVal === q.expected);
+            } else if (q.type === 'color-naming') {
+                isCorrect = (selectedVal === q.expectedKey);
+            }
+
+            const isDistorted = document.getElementById('colorDistortionCheck').checked;
+            if (isDistorted) distortionCount++;
+
+            userAnswers.push({
+                question: q,
+                given: selectedVal,
+                isCorrect: isCorrect,
+                responseTimeMs: responseTimeMs,
+                isDistorted: isDistorted
+            });
+
+            currentIndex++;
+
+            if (currentIndex < generatedQuestions.length) {
+                renderCurrentQuestion();
+            } else {
+                generateClinicalReport();
+            }
+        }
+
+        /* ==========================================================================
+           7. ISHIHARA RENDERER ENGINE
+           ========================================================================== */
+        function renderIshiharaPlate(plateData) {
+            const canvas = document.getElementById('ishiharaCanvas');
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = width / 2 - 8;
+
+            ctx.clearRect(0, 0, width, height);
+
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+            ctx.fillStyle = "#090714";
+            ctx.fill();
+
+            const maskCanvas = document.createElement('canvas');
+            maskCanvas.width = width;
+            maskCanvas.height = height;
+            const maskCtx = maskCanvas.getContext('2d');
+            maskCtx.fillStyle = '#000000';
+            maskCtx.fillRect(0, 0, width, height);
+            maskCtx.fillStyle = '#ffffff';
+            maskCtx.font = '900 130px Tajawal, sans-serif';
+            maskCtx.textAlign = 'center';
+            maskCtx.textBaseline = 'middle';
+            maskCtx.fillText(plateData.number, centerX, centerY + 8);
+
+            const maskData = maskCtx.getImageData(0, 0, width, height).data;
+            const dotsCount = 1000;
+
+            for (let i = 0; i < dotsCount; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const r = Math.sqrt(Math.random()) * (radius - 10);
+                const x = Math.floor(centerX + r * Math.cos(angle));
+                const y = Math.floor(centerY + r * Math.sin(angle));
+                const dotRadius = Math.random() * 5 + 2.5;
+
+                const maskIndex = (y * width + x) * 4;
+                const isForeground = maskData[maskIndex] > 128;
+
+                ctx.beginPath();
+                ctx.arc(x, y, dotRadius, 0, Math.PI * 2);
+                ctx.fillStyle = isForeground 
+                    ? adjustColorBrightness(plateData.fgColor, (Math.random() - 0.5) * 35)
+                    : adjustColorBrightness(plateData.bgColor, (Math.random() - 0.5) * 35);
+                ctx.fill();
+            }
+        }
+
+        function adjustColorBrightness(hex, percent) {
+            let num = parseInt(hex.replace('#', ''), 16),
+                amt = Math.round(2.55 * percent),
+                R = (num >> 16) + amt,
+                G = (num >> 8 & 0x00FF) + amt,
+                B = (num & 0x0000FF) + amt;
+            return "#" + (0x1000000 + (R < 255 ? R < 0 ? 0 : R : 255) * 0x10000 + (G < 255 ? G < 0 ? 0 : G : 255) * 0x100 + (B < 255 ? B < 0 ? 0 : B : 255)).toString(16).slice(1);
+        }
+
+        function hexToRgb(hex) {
+            if(!hex.startsWith('#')) return hex;
+            let num = parseInt(hex.replace('#', ''), 16);
+            return `RGB: (${num >> 16}, ${num >> 8 & 0x00FF}, ${num & 0x0000FF})`;
+        }
+
+        /* ==========================================================================
+           8. CLINICAL REPORT & MISSED COLORS TABLE GENERATOR
+           ========================================================================== */
+        function generateClinicalReport() {
+            const t = translations[currentLang] || translations.ar;
+
+            const totalCount = userAnswers.length;
+            const correctCount = userAnswers.filter(a => a.isCorrect).length;
+            const accuracyPct = Math.round((correctCount / totalCount) * 100);
+
+            // Average Response Time
+            const totalMs = userAnswers.reduce((acc, a) => acc + a.responseTimeMs, 0);
+            const avgTimeSec = ((totalMs / totalCount) / 1000).toFixed(2);
+
+            // Analyze Ishihara specific failures
+            const ishiharaAnswers = userAnswers.filter(a => a.question.type === 'ishihara');
+            let protanFailures = ishiharaAnswers.filter(a => a.question.data.targetType === 'protan' && !a.isCorrect).length;
+            let deutanFailures = ishiharaAnswers.filter(a => a.question.data.targetType === 'deutan' && !a.isCorrect).length;
+            let tritanFailures = ishiharaAnswers.filter(a => a.question.data.targetType === 'tritan' && !a.isCorrect).length;
+
+            let isNormal = (accuracyPct >= 85 && distortionCount <= 2);
+            let diagnosisText = t.normalDiag;
+            let adviceArray = t.adviceNormal;
+
+            if (!isNormal) {
+                if (protanFailures > 0 && protanFailures >= deutanFailures) {
+                    diagnosisText = t.protanDiag;
+                    adviceArray = t.adviceRedGreen;
+                } else if (deutanFailures > 0) {
+                    diagnosisText = t.deutanDiag;
+                    adviceArray = t.adviceRedGreen;
+                } else if (tritanFailures > 0) {
+                    diagnosisText = t.tritanDiag;
+                    adviceArray = t.adviceBlueYellow;
+                } else {
+                    diagnosisText = t.generalDiag;
+                    adviceArray = t.adviceRedGreen;
+                }
+            }
+
+            // Set Header Status Tags
+            const statusTag = document.getElementById('statusTag');
+            statusTag.textContent = isNormal ? t.normalTitle : diagnosisText;
+            statusTag.className = 'status-tag ' + (isNormal ? 'normal' : 'defective');
+
+            document.getElementById('valScore').textContent = `${correctCount} / ${totalCount}`;
+            document.getElementById('valAccuracy').textContent = `${accuracyPct}%`;
+            document.getElementById('valAvgTime').textContent = `${avgTimeSec}s`;
+            document.getElementById('valDiagnosis').textContent = diagnosisText;
+
+            // POPULATE MISSED & INCORRECT COLORS TABLE
+            const tbody = document.getElementById('missedColorsTbody');
+            tbody.innerHTML = '';
+
+            userAnswers.forEach((ans, idx) => {
+                const tr = document.createElement('tr');
+                const q = ans.question;
+
+                let modeLabel = "";
+                let swatchHtml = "";
+                let expectedLabel = "";
+                let givenLabel = "";
+                let hexCode = "";
+
+                if (q.type === 'ishihara') {
+                    modeLabel = t.modeIshihara;
+                    swatchHtml = `<span class="table-swatch" style="background:${q.data.fgColor};"></span> <span class="table-swatch" style="background:${q.data.bgColor};"></span>`;
+                    expectedLabel = q.data.number;
+                    givenLabel = (ans.given === 'none') ? t.noneOpt : ans.given;
+                    hexCode = `${q.data.fgColor} / ${q.data.bgColor}`;
+                } else if (q.type === 'color-naming') {
+                    modeLabel = t.modeNaming;
+                    swatchHtml = `<span class="table-swatch" style="background:${q.colorObj.hex};"></span>`;
+                    expectedLabel = getColorNameTranslated(q.colorObj, currentLang);
+                    
+                    const givenObj = MASTER_COLORS.find(c => c.key === ans.given);
+                    givenLabel = givenObj ? getColorNameTranslated(givenObj, currentLang) : ans.given;
+                    hexCode = q.colorObj.hex;
+                } else if (q.type === 'contrast') {
+                    modeLabel = t.modeContrast;
+                    swatchHtml = `<span class="table-swatch" style="background:${q.fgColor};"></span>`;
+                    expectedLabel = q.number;
+                    givenLabel = (ans.given === 'none') ? t.noneOpt : ans.given;
+                    hexCode = q.fgColor;
+                }
+
+                const statusBadge = ans.isCorrect 
+                    ? `<span class="badge-ok">صحيح ✓</span>`
+                    : `<span class="badge-err">خطأ ✗</span>`;
+
+                tr.innerHTML = `
+                    <td><strong>${idx + 1}</strong></td>
+                    <td>${modeLabel}</td>
+                    <td>${swatchHtml}</td>
+                    <td><strong>${expectedLabel}</strong></td>
+                    <td style="color:${ans.isCorrect ? 'var(--success)' : 'var(--danger)'}">${givenLabel}</td>
+                    <td style="font-family:var(--font-code); font-size:0.85rem;">${hexCode}</td>
+                    <td>${statusBadge}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Populate Advice List
+            const adviceList = document.getElementById('adviceList');
+            adviceList.innerHTML = '';
+            adviceArray.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                adviceList.appendChild(li);
+            });
+
+            // Set Hash and Date
+            document.getElementById('reportHash').textContent = '#DS-' + Math.floor(100000 + Math.random() * 900000) + '-2026';
+            document.getElementById('reportDate').textContent = new Date().toISOString().split('T')[0];
+
+            showScreen('screen-report');
+        }
+
+        /* ==========================================================================
+           9. THEMING ENGINE
+           ========================================================================== */
+        function initTheme() {
+            const toggleBtn = document.getElementById('themeToggleBtn');
+            const html = document.documentElement;
+
+            const savedTheme = localStorage.getItem('dstr_lab_theme') || 'dark';
+            html.setAttribute('data-theme', savedTheme);
+            updateThemeUI(savedTheme);
+
+            toggleBtn.addEventListener('click', () => {
+                const current = html.getAttribute('data-theme');
+                const newTheme = current === 'dark' ? 'light' : 'dark';
+                html.setAttribute('data-theme', newTheme);
+                localStorage.setItem('dstr_lab_theme', newTheme);
+                updateThemeUI(newTheme);
+            });
+        }
+
+        function updateThemeUI(theme) {
+            const t = translations[currentLang] || translations.ar;
+            const themeIcon = document.getElementById('themeIcon');
+            const themeText = document.getElementById('themeText');
+
+            if (theme === 'dark') {
+                themeIcon.className = 'fa-solid fa-moon';
+                themeText.textContent = t.dark;
+            } else {
+                themeIcon.className = 'fa-solid fa-sun';
+                themeText.textContent = t.light;
+            }
+        }
+    </script>
+</body>
+</html>
